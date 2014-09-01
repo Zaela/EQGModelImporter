@@ -15,7 +15,6 @@ namespace LAY
 		uint32 version;
 		uint32 strings_len;
 		uint32 count;
-		static const uint32 SIZE = sizeof(uint32) * 4;
 	};
 
 	struct Entry

@@ -40,7 +40,7 @@ namespace PRT
 		byte* ptr = Util::CheckHeader(L, "PTCL", ".prt");
 
 		Header* header = (Header*)ptr;
-		uint32 pos = Header::SIZE;
+		uint32 pos = sizeof(Header);
 
 		lua_createtable(L, header->particle_count, 0); //to return
 
@@ -52,7 +52,7 @@ namespace PRT
 				lua_createtable(L, 11, 0);
 
 				DataV4* data = (DataV4*)&ptr[pos];
-				pos += DataV4::SIZE;
+				pos += sizeof(DataV4);
 
 				PackV4(L, data);
 
@@ -67,7 +67,7 @@ namespace PRT
 				lua_createtable(L, 12, 0);
 
 				DataV5* data = (DataV5*)&ptr[pos];
-				pos += DataV5::SIZE;
+				pos += sizeof(DataV5);
 
 				PackV4(L, data);
 
@@ -95,7 +95,7 @@ namespace PRT
 		header.particle_count = lua_objlen(L, 1);
 
 		Util::Buffer buf;
-		buf.Add(&header, Header::SIZE);
+		buf.Add(&header, sizeof(Header));
 
 		for (uint32 i = 1; i <= header.particle_count; ++i)
 		{
@@ -123,7 +123,7 @@ namespace PRT
 			d.unknownC = Util::GetInt(L, -2, 8);
 			lua_pop(L, 1);
 
-			buf.Add(&d, DataV4::SIZE);
+			buf.Add(&d, sizeof(DataV4));
 
 			lua_pop(L, 1);
 		}

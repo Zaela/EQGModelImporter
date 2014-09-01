@@ -15,7 +15,6 @@ namespace PTS
 		char magic[4]; //EQPT
 		uint32 data_count;
 		uint32 version;
-		static const uint32 SIZE = sizeof(uint32) * 3;
 	};
 
 	struct Data
@@ -25,7 +24,6 @@ namespace PTS
 		float translation[3];
 		float rotation[3];
 		float scale[3];
-		static const uint32 SIZE = 128 + sizeof(float) * 9;
 	};
 }
 

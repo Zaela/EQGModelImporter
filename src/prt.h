@@ -15,7 +15,6 @@ namespace PRT
 		char magic[4]; //PTCL
 		uint32 particle_count;
 		uint32 version;
-		static const uint32 SIZE = sizeof(uint32) * 3;
 	};
 
 	struct DataV4
@@ -27,13 +26,13 @@ namespace PRT
 		uint32 unknownB; //Always seen as 0
 		int32 unknownFFFFFFFF; //Always seen as FFFFFFFF (Transparency maybe?)
 		uint32 unknownC; //Seen 1 or 0, mostly 0
-		static const uint32 SIZE = 64 + sizeof(uint32) * 10;
+		//static const uint32 SIZE = 64 + sizeof(uint32) * 10;
 	};
 
 	struct DataV5 : public DataV4
 	{
 		uint32 particle_id2; //Seen this match particle_id on most newer prt files
-		static const uint32 SIZE = DataV4::SIZE + sizeof(uint32);
+		//static const uint32 SIZE = DataV4::SIZE + sizeof(uint32);
 	};
 }
 

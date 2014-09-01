@@ -8,7 +8,7 @@ namespace LAY
 		byte* ptr = Util::CheckHeader(L, "EQGL", ".lay");
 
 		Header* header = (Header*)ptr;
-		uint32 pos = Header::SIZE;
+		uint32 pos = sizeof(Header);
 		uint32 ent_size;
 		switch (header->version)
 		{

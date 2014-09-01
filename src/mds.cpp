@@ -10,7 +10,7 @@ namespace MDS
 		byte* ptr = Util::CheckHeader(L, "EQGS", ".mds");
 
 		Header* header = (Header*)ptr;
-		uint32 pos = Header::SIZE;
+		uint32 pos = sizeof(Header);
 
 		lua_createtable(L, 0, 5); //to return
 
@@ -23,7 +23,7 @@ namespace MDS
 		for (uint32 i = 1; i <= header->material_count; ++i)
 		{
 			Material* mat = (Material*)&ptr[pos];
-			pos += Material::SIZE;
+			pos += sizeof(Material);
 
 			lua_pushinteger(L, i);
 			lua_createtable(L, mat->property_count, 2); //one table per material
@@ -36,7 +36,7 @@ namespace MDS
 			for (uint32 j = 1; j <= mat->property_count; ++j)
 			{
 				Property* prop = (Property*)&ptr[pos];
-				pos += Property::SIZE;
+				pos += sizeof(Property);
 
 				lua_pushinteger(L, j);
 				lua_createtable(L, 0, 3);
@@ -65,7 +65,7 @@ namespace MDS
 		for (uint32 i = 1; i <= header->bone_count; ++i)
 		{
 			Bone* bone = (Bone*)&ptr[pos];
-			pos += Bone::SIZE;
+			pos += sizeof(Bone);
 
 			lua_pushinteger(L, i);
 			lua_createtable(L, 0, 12);
@@ -123,12 +123,12 @@ namespace MDS
 		for (int i = -1; i < n && i < 1; ++i)
 		{
 			SubHeader* subheader = (SubHeader*)&ptr[pos];
-			pos += SubHeader::SIZE;
+			pos += sizeof(SubHeader);
 
 			for (uint32 j = 0; j < subheader->vertex_count; ++j)
 			{
 				Vertex* vert = (Vertex*)&ptr[pos];
-				pos += Vertex::SIZE;
+				pos += sizeof(Vertex);
 
 				lua_pushinteger(L, ++vert_count);
 				lua_createtable(L, 0, 8);
@@ -156,7 +156,7 @@ namespace MDS
 			for (uint32 j = 0; j < subheader->triangle_count; ++j)
 			{
 				Triangle* tri = (Triangle*)&ptr[pos];
-				pos += Triangle::SIZE;
+				pos += sizeof(Triangle);
 
 				lua_pushinteger(L, ++tri_count);
 				lua_createtable(L, 3, 2);
@@ -181,7 +181,7 @@ namespace MDS
 			for (uint32 j = 0; j < subheader->bone_assignment_count; ++j)
 			{
 				BoneAssignment* ba = (BoneAssignment*)&ptr[pos];
-				pos += BoneAssignment::SIZE;
+				pos += sizeof(BoneAssignment);
 
 				lua_pushinteger(L, ++ba_count);
 				lua_createtable(L, ba->count * 2, 1);
@@ -189,44 +189,14 @@ namespace MDS
 				lua_pushinteger(L, ba->count);
 				lua_setfield(L, -2, "count");
 
-				if (ba->count >= 1)
+				for (uint32 j = 0; j < ba->count; ++j)
 				{
-					lua_pushinteger(L, 1);
-					lua_pushinteger(L, ba->bone1);
+					lua_pushinteger(L, j * 2 + 1);
+					lua_pushinteger(L, ba->weights[j].bone);
 					lua_settable(L, -3);
-					lua_pushinteger(L, 2);
-					lua_pushnumber(L, Util::FloatToDouble(ba->weight1));
+					lua_pushinteger(L, j * 2 + 2);
+					lua_pushnumber(L, Util::FloatToDouble(ba->weights[j].weight));
 					lua_settable(L, -3);
-
-					if (ba->count >= 2)
-					{
-						lua_pushinteger(L, 3);
-						lua_pushinteger(L, ba->bone2);
-						lua_settable(L, -3);
-						lua_pushinteger(L, 4);
-						lua_pushnumber(L, Util::FloatToDouble(ba->weight2));
-						lua_settable(L, -3);
-
-						if (ba->count >= 3)
-						{
-							lua_pushinteger(L, 5);
-							lua_pushinteger(L, ba->bone3);
-							lua_settable(L, -3);
-							lua_pushinteger(L, 6);
-							lua_pushnumber(L, Util::FloatToDouble(ba->weight3));
-							lua_settable(L, -3);
-
-							if (ba->count >= 4)
-							{
-								lua_pushinteger(L, 7);
-								lua_pushinteger(L, ba->bone4);
-								lua_settable(L, -3);
-								lua_pushinteger(L, 8);
-								lua_pushnumber(L, Util::FloatToDouble(ba->weight4));
-								lua_settable(L, -3);
-							}
-						}
-					}
 				}
 
 				lua_settable(L, -3);
@@ -241,7 +211,7 @@ namespace MDS
 		
 		//sub sections -- we only care about the first one (for now?)
 		SubHeader* subheader = (SubHeader*)&ptr[pos];
-		pos += SubHeader::SIZE;
+		pos += sizeof(SubHeader);
 
 		//vertices -- always the smaller type?
 		lua_createtable(L, subheader->vertex_count, 0);
@@ -249,7 +219,7 @@ namespace MDS
 		for (uint32 i = 1; i <= subheader->vertex_count; ++i)
 		{
 			Vertex* vert = (Vertex*)&ptr[pos];
-			pos += Vertex::SIZE;
+			pos += sizeof(Vertex);
 
 			lua_pushinteger(L, i);
 			lua_createtable(L, 0, 8);
@@ -282,7 +252,7 @@ namespace MDS
 		for (uint32 i = 1; i <= subheader->triangle_count; ++i)
 		{
 			Triangle* tri = (Triangle*)&ptr[pos];
-			pos += Triangle::SIZE;
+			pos += sizeof(Triangle);
 
 			lua_pushinteger(L, i);
 			lua_createtable(L, 3, 2);
@@ -312,7 +282,7 @@ namespace MDS
 		for (uint32 i = 1; i<= subheader->bone_assignment_count; ++i)
 		{
 			BoneAssignment* ba = (BoneAssignment*)&ptr[pos];
-			pos += BoneAssignment::SIZE;
+			pos += sizeof(BoneAssignment);
 
 			lua_pushinteger(L, i);
 			lua_createtable(L, ba->count * 2, 1);
@@ -320,44 +290,14 @@ namespace MDS
 			lua_pushinteger(L, ba->count);
 			lua_setfield(L, -2, "count");
 
-			if (ba->count >= 1)
+			for (uint32 j = 0; j < ba->count; ++j)
 			{
-				lua_pushinteger(L, 1);
-				lua_pushinteger(L, ba->bone1);
+				lua_pushinteger(L, j * 2 + 1);
+				lua_pushinteger(L, ba->weights[j].bone);
 				lua_settable(L, -3);
-				lua_pushinteger(L, 2);
-				lua_pushnumber(L, Util::FloatToDouble(ba->weight1));
+				lua_pushinteger(L, j * 2 + 2);
+				lua_pushnumber(L, Util::FloatToDouble(ba->weights[j].weight));
 				lua_settable(L, -3);
-
-				if (ba->count >= 2)
-				{
-					lua_pushinteger(L, 3);
-					lua_pushinteger(L, ba->bone2);
-					lua_settable(L, -3);
-					lua_pushinteger(L, 4);
-					lua_pushnumber(L, Util::FloatToDouble(ba->weight2));
-					lua_settable(L, -3);
-
-					if (ba->count >= 3)
-					{
-						lua_pushinteger(L, 5);
-						lua_pushinteger(L, ba->bone3);
-						lua_settable(L, -3);
-						lua_pushinteger(L, 6);
-						lua_pushnumber(L, Util::FloatToDouble(ba->weight3));
-						lua_settable(L, -3);
-
-						if (ba->count >= 4)
-						{
-							lua_pushinteger(L, 7);
-							lua_pushinteger(L, ba->bone4);
-							lua_settable(L, -3);
-							lua_pushinteger(L, 8);
-							lua_pushnumber(L, Util::FloatToDouble(ba->weight4));
-							lua_settable(L, -3);
-						}
-					}
-				}
 			}
 
 			lua_settable(L, -3);

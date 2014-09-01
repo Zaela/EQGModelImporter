@@ -8,14 +8,14 @@ namespace PTS
 		byte* ptr = Util::CheckHeader(L, "EQPT", ".pts");
 
 		Header* header = (Header*)ptr;
-		uint32 pos = Header::SIZE;
+		uint32 pos = sizeof(Header);
 
 		lua_createtable(L, header->data_count, 0); //to return
 
 		for (uint32 i = 1; i <= header->data_count; ++i)
 		{
 			Data* d = (Data*)&ptr[pos];
-			pos += Data::SIZE;
+			pos += sizeof(Data);
 
 			lua_pushinteger(L, i);
 			lua_createtable(L, 0, 5);
@@ -83,7 +83,7 @@ namespace PTS
 		header.data_count = lua_objlen(L, 1);
 
 		Util::Buffer buf;
-		buf.Add(&header, Header::SIZE);
+		buf.Add(&header, sizeof(Header));
 
 		for (uint32 i = 1; i <= header.data_count; ++i)
 		{
@@ -112,7 +112,7 @@ namespace PTS
 			d.scale[2] = Util::GetFloat(L, -1, "z");
 			lua_pop(L, 1);
 
-			buf.Add(&d, Data::SIZE);
+			buf.Add(&d, sizeof(Data));
 
 			lua_pop(L, 1);
 		}

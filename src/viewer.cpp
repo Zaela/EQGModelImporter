@@ -595,7 +595,7 @@ namespace Viewer
 						for (uint32 i = 0; i < frame_count; ++i)
 						{
 							const ANI::Frame* frame = (const ANI::Frame*)&data[pos];
-							pos += ANI::Frame::SIZE;
+							pos += sizeof(ANI::Frame);
 
 							const int fr = mem_frame_id + frame->milliseconds;
 

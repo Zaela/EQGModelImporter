@@ -8,7 +8,7 @@ namespace MOD
 		byte* ptr = Util::CheckHeader(L, "EQGM", ".mod");
 
 		Header* header = (Header*)ptr;
-		uint32 pos = Header::SIZE;
+		uint32 pos = sizeof(Header);
 
 		lua_createtable(L, 0, 5); //to return
 
@@ -21,7 +21,7 @@ namespace MOD
 		for (uint32 i = 1; i <= header->material_count; ++i)
 		{
 			Material* mat = (Material*)&ptr[pos];
-			pos += Material::SIZE;
+			pos += sizeof(Material);
 
 			lua_pushinteger(L, i);
 			lua_createtable(L, mat->property_count, 2); //one table per material
@@ -34,7 +34,7 @@ namespace MOD
 			for (uint32 j = 1; j <= mat->property_count; ++j)
 			{
 				Property* prop = (Property*)&ptr[pos];
-				pos += Property::SIZE;
+				pos += sizeof(Property);
 
 				lua_pushinteger(L, j);
 				lua_createtable(L, 0, 3);
@@ -65,7 +65,7 @@ namespace MOD
 			for (uint32 i = 1; i <= header->vertex_count; ++i)
 			{
 				Vertex* vert = (Vertex*)&ptr[pos];
-				pos += Vertex::SIZE;
+				pos += sizeof(Vertex);
 
 				lua_pushinteger(L, i);
 				lua_createtable(L, 0, 8);
@@ -95,7 +95,7 @@ namespace MOD
 			for (uint32 i = 1; i <= header->vertex_count; ++i)
 			{
 				VertexV3* vert = (VertexV3*)&ptr[pos];
-				pos += VertexV3::SIZE;
+				pos += sizeof(VertexV3);
 
 				lua_pushinteger(L, i);
 				lua_createtable(L, 0, 8);
@@ -129,7 +129,7 @@ namespace MOD
 		for (uint32 i = 1; i <= header->triangle_count; ++i)
 		{
 			Triangle* tri = (Triangle*)&ptr[pos];
-			pos += Triangle::SIZE;
+			pos += sizeof(Triangle);
 
 			lua_pushinteger(L, i);
 			lua_createtable(L, 3, 2);
@@ -159,7 +159,7 @@ namespace MOD
 		for (uint32 i = 1; i <= header->bone_count; ++i)
 		{
 			Bone* bone = (Bone*)&ptr[pos];
-			pos += Bone::SIZE;
+			pos += sizeof(Bone);
 
 			lua_pushinteger(L, i);
 			lua_createtable(L, 0, 12);
@@ -214,7 +214,7 @@ namespace MOD
 			for (uint32 i = 1; i<= header->vertex_count; ++i)
 			{
 				BoneAssignment* ba = (BoneAssignment*)&ptr[pos];
-				pos += BoneAssignment::SIZE;
+				pos += sizeof(BoneAssignment);
 
 				lua_pushinteger(L, i);
 				lua_createtable(L, ba->count * 2, 1);
@@ -222,44 +222,14 @@ namespace MOD
 				lua_pushinteger(L, ba->count);
 				lua_setfield(L, -2, "count");
 
-				if (ba->count >= 1)
+				for (uint32 j = 0; j < ba->count; ++j)
 				{
-					lua_pushinteger(L, 1);
-					lua_pushinteger(L, ba->bone1);
+					lua_pushinteger(L, j * 2 + 1);
+					lua_pushinteger(L, ba->weights[j].bone);
 					lua_settable(L, -3);
-					lua_pushinteger(L, 2);
-					lua_pushnumber(L, Util::FloatToDouble(ba->weight1));
+					lua_pushinteger(L, j * 2 + 2);
+					lua_pushnumber(L, Util::FloatToDouble(ba->weights[j].weight));
 					lua_settable(L, -3);
-
-					if (ba->count >= 2)
-					{
-						lua_pushinteger(L, 3);
-						lua_pushinteger(L, ba->bone2);
-						lua_settable(L, -3);
-						lua_pushinteger(L, 4);
-						lua_pushnumber(L, Util::FloatToDouble(ba->weight2));
-						lua_settable(L, -3);
-
-						if (ba->count >= 3)
-						{
-							lua_pushinteger(L, 5);
-							lua_pushinteger(L, ba->bone3);
-							lua_settable(L, -3);
-							lua_pushinteger(L, 6);
-							lua_pushnumber(L, Util::FloatToDouble(ba->weight3));
-							lua_settable(L, -3);
-
-							if (ba->count >= 4)
-							{
-								lua_pushinteger(L, 7);
-								lua_pushinteger(L, ba->bone4);
-								lua_settable(L, -3);
-								lua_pushinteger(L, 8);
-								lua_pushnumber(L, Util::FloatToDouble(ba->weight4));
-								lua_settable(L, -3);
-							}
-						}
-					}
 				}
 
 				lua_settable(L, -3);
@@ -311,7 +281,7 @@ namespace MOD
 			name_buf.Add(name, len);
 
 			mat.property_count = lua_objlen(L, -1);
-			data_buf.Add(&mat, Material::SIZE);
+			data_buf.Add(&mat, sizeof(Material));
 
 			for (uint32 j = 1; j <= mat.property_count; ++j)
 			{
@@ -334,7 +304,7 @@ namespace MOD
 					name_buf.Add(name, len);
 				}
 
-				data_buf.Add(&prop, Property::SIZE);
+				data_buf.Add(&prop, sizeof(Property));
 				lua_pop(L, 1);
 			}
 
@@ -359,7 +329,7 @@ namespace MOD
 			vert.u = Util::GetFloat(L, -1, "u");
 			vert.v = Util::GetFloat(L, -1, "v");
 
-			data_buf.Add(&vert, Vertex::SIZE);
+			data_buf.Add(&vert, sizeof(Vertex));
 			lua_pop(L, 1);
 		}
 		lua_pop(L, 1);
@@ -382,7 +352,7 @@ namespace MOD
 			tri.material = Util::GetInt(L, -1, "material");
 			tri.flag = Util::GetInt(L, -1, "flag");
 
-			data_buf.Add(&tri, Triangle::SIZE);
+			data_buf.Add(&tri, sizeof(Triangle));
 			lua_pop(L, 1);
 		}
 		lua_pop(L, 1);
@@ -436,7 +406,7 @@ namespace MOD
 				bone.next_bone = Util::GetInt(L, -1, "next_bone");
 			}
 
-			data_buf.Add(&bone, Bone::SIZE);
+			data_buf.Add(&bone, sizeof(Bone));
 			lua_pop(L, 1);
 		}
 		lua_pop(L, 1);
@@ -453,51 +423,15 @@ namespace MOD
 			uint32 count = Util::GetInt(L, -1, "count");
 			ba.count = count;
 
-			if (count >= 1)
+			memset(ba.weights, 0, sizeof(Weight) * 4);
+
+			for (uint32 j = 0; j < count; ++j)
 			{
-				ba.bone1 = Util::GetInt(L, -2, 1);
-				ba.weight1 = Util::GetFloat(L, -2, 2);
-			}
-			else
-			{
-				ba.bone1 = 0;
-				ba.weight1 = 0;
+				ba.weights[j].bone = Util::GetInt(L, -2, j * 2 + 1);
+				ba.weights[j].weight = Util::GetFloat(L, -2, j * 2 + 2);
 			}
 
-			if (count >= 2)
-			{
-				ba.bone2 = Util::GetInt(L, -2, 3);
-				ba.weight2 = Util::GetFloat(L, -2, 4);
-			}
-			else
-			{
-				ba.bone2 = 0;
-				ba.weight2 = 0;
-			}
-
-			if (count >= 3)
-			{
-				ba.bone3 = Util::GetInt(L, -2, 5);
-				ba.weight3 = Util::GetFloat(L, -2, 6);
-			}
-			else
-			{
-				ba.bone3 = 0;
-				ba.weight3 = 0;
-			}
-
-			if (count >= 4)
-			{
-				ba.bone4 = Util::GetInt(L, -2, 5);
-				ba.weight4 = Util::GetFloat(L, -2, 6);
-			}
-			else
-			{
-				ba.bone4 = 0;
-				ba.weight4 = 0;
-			}
-
-			data_buf.Add(&ba, BoneAssignment::SIZE);
+			data_buf.Add(&ba, sizeof(BoneAssignment));
 			lua_pop(L, 1);
 		}
 		lua_pop(L, 1);
@@ -505,7 +439,7 @@ namespace MOD
 		header.strings_len = name_buf.GetLen();
 
 		Util::Buffer buf;
-		buf.Add(&header, Header::SIZE);
+		buf.Add(&header, sizeof(Header));
 
 		byte* b = name_buf.Take();
 		buf.Add(b, name_buf.GetLen());

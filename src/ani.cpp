@@ -25,7 +25,7 @@ namespace ANI
 		for (uint32 i = 0; i < header->count; ++i)
 		{
 			FramesHeader* fh = (FramesHeader*)&ptr[pos];
-			pos += FramesHeader::SIZE;
+			pos += sizeof(FramesHeader);
 
 			lua_pushstring(L, &string_block[fh->bone_name_index]);
 			lua_createtable(L, 0, 2);
@@ -33,7 +33,7 @@ namespace ANI
 			lua_pushinteger(L, fh->frame_count);
 			lua_setfield(L, -2, "count");
 
-			uint32 len = Frame::SIZE * fh->frame_count;
+			uint32 len = sizeof(Frame) * fh->frame_count;
 			byte* data = (byte*)lua_newuserdata(L, len);
 			memcpy(data, &ptr[pos], len);
 			ptr += len;

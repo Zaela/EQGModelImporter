@@ -20,7 +20,6 @@ namespace MDS
 		uint32 material_count;
 		uint32 bone_count;
 		uint32 sub_count;
-		static const uint32 SIZE = sizeof(uint32) * 6;
 	};
 
 	struct SubHeader
@@ -30,6 +29,5 @@ namespace MDS
 		uint32 vertex_count;
 		uint32 triangle_count;
 		uint32 bone_assignment_count;
-		static const uint32 SIZE = sizeof(uint32) * 5;
 	};
 }

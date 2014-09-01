@@ -27,7 +27,6 @@ namespace ANI
 	{
 		uint32 frame_count;
 		uint32 bone_name_index;
-		static const uint32 SIZE = sizeof(uint32) * 2;
 	};
 
 	struct Frame
@@ -36,7 +35,6 @@ namespace ANI
 		float x, y, z;
 		float rot_x, rot_y, rot_z, rot_w;
 		float scale_x, scale_y, scale_z;
-		static const uint32 SIZE = sizeof(float) * 11;
 	};
 }
 

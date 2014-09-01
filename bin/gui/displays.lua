@@ -3,8 +3,7 @@ local lfs = require "lfs"
 
 function copy_tbl_recurse(from, to)
 	for k, v in pairs(from) do
-		local t = type(v)
-		if t == "table" then
+		if type(v) == "table" then
 			local add = {}
 			to[k] = add
 			copy_tbl_recurse(v, add)
